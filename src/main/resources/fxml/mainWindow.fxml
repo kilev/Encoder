@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<Pane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kil.MainWindowController">
+   <children>
+      <VBox alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER">
+               <children>
+                  <Label contentDisplay="RIGHT" text="Key ">
+                     <graphic>
+                        <TextField fx:id="keyField" />
+                     </graphic>
+                  </Label>
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="TOP_CENTER">
+               <children>
+                  <VBox alignment="TOP_CENTER" spacing="5.0">
+                     <children>
+                        <Label text="Open text" />
+                        <TextArea fx:id="openText" prefHeight="200.0" prefWidth="200.0" />
+                        <Button mnemonicParsing="false" onAction="#encodeOpenText" text="Encode" />
+                        <HBox alignment="CENTER" spacing="5.0">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#loadOpenDataFromFile" text="Load" />
+                              <Button mnemonicParsing="false" onAction="#saveOpenDataToFile" text="save" />
+                           </children>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </VBox>
+                  <VBox alignment="TOP_CENTER" spacing="5.0">
+                     <children>
+                        <Label text="Close text" />
+                        <TextArea fx:id="closeText" prefHeight="200.0" prefWidth="200.0" />
+                        <Button mnemonicParsing="false" onAction="#decodeCloseText" text="Decode" />
+                        <HBox alignment="CENTER" spacing="5.0">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#loadCloseDataFromFile" text="Load" />
+                              <Button mnemonicParsing="false" onAction="#saveCloseDataToFile" text="Save" />
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</Pane>
