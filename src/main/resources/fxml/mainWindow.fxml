@@ -260,7 +260,7 @@
               <menus>
                 <Menu mnemonicParsing="false" onAction="#showHelp" text="Справка">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
+                    <MenuItem mnemonicParsing="false" text="Формат продолжительности" />
                   </items>
                 </Menu>
               </menus>

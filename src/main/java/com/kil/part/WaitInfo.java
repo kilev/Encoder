@@ -12,13 +12,12 @@ public class WaitInfo {
 
     void startStayInQueue() {
         startWaitTime = LocalDateTime.now();
-        Duration duration = Duration.from();
     }
 
     /**
      * @return time interval spent on the queue
      */
     Duration finishStayInQueue() {
-
+        return null;
     }
 }
