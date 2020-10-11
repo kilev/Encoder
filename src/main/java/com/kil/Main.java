@@ -15,7 +15,8 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/mainWindow.fxml"));
         Parent mainWindow = loader.load();
         stage.setScene(new Scene(mainWindow));
-        stage.setTitle("TextEncoder");
+        stage.setResizable(false);
+        stage.setTitle("Моделирование марковских процессов");
         stage.show();
     }
 

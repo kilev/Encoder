@@ -1,151 +1,146 @@
 package com.kil;
 
-import com.google.common.collect.Lists;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
-import javafx.stage.Window;
-import lombok.SneakyThrows;
+import org.apache.commons.math3.linear.FieldMatrix;
+import org.apache.commons.math3.linear.FieldVector;
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.util.BigReal;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import javax.annotation.Nonnull;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainWindowController {
-    private static final Character LINE_SEPARATOR = '\n';
-
-    private static final String DEFAULT_KEY = "ВАЗА";
-    private static final String DEFAULT_OPEN_TEXT = "КРИПТОГРАФИЯ";
-
-    private static final List<Character> DICTIONARY = List.of(
-            'А', 'а', 'Б', 'б', 'В', 'в', 'Г', 'г',
-            'Д', 'д', 'Е', 'е', 'Ё', 'ё', 'Ж', 'ж',
-            'З', 'з', 'И', 'и', 'Й', 'й', 'К', 'к',
-            'Л', 'л', 'М', 'м', 'Н', 'н', 'О', 'о',
-            'П', 'п', 'Р', 'р', 'С', 'с', 'Т', 'т',
-            'У', 'у', 'Ф', 'ф', 'Х', 'х', 'Ц', 'ц',
-            'Ч', 'ч', 'Ш', 'ш', 'Щ', 'щ', 'Ъ', 'ъ',
-            'Ы', 'ы', 'Ь', 'ь', 'Э', 'э', 'Ю', 'ю',
-            'Я', 'я', '?', '#', '@', '$', '%', '^',
-            '&', '*', LINE_SEPARATOR);
-
-    private static final FileChooser fileChooser = new FileChooser();
 
     @FXML
-    private TextField keyField;
+    private TextField tpm11;
 
     @FXML
-    private TextArea openText;
+    private TextField tpm21;
 
     @FXML
-    private TextArea closeText;
+    private TextField tpm31;
 
     @FXML
-    void decodeCloseText(ActionEvent event) {
-        openText.setText(decode(closeText.getText(), keyField.getText()));
-    }
+    private TextField tpm12;
 
     @FXML
-    void encodeOpenText(ActionEvent event) {
-        closeText.setText(encode(openText.getText(), keyField.getText()));
-    }
+    private TextField tpm22;
 
     @FXML
-    void loadCloseDataFromFile(ActionEvent event) {
-        File file = fileChooser.showOpenDialog(getWindow());
-        if (file != null) {
-            closeText.setText(readFromFile(file));
-        }
-    }
+    private TextField tpm32;
 
     @FXML
-    void loadOpenDataFromFile(ActionEvent event) {
-        File file = fileChooser.showOpenDialog(getWindow());
-        if (file != null) {
-            openText.setText(readFromFile(file));
-        }
-    }
-
+    private TextField tpm13;
 
     @FXML
-    void saveCloseDataToFile(ActionEvent event) {
-        File file = fileChooser.showOpenDialog(getWindow());
-        if (file != null) {
-            writeToFile(closeText.getText(), file);
-        }
-    }
+    private TextField tpm23;
 
     @FXML
-    void saveOpenDataToFile(ActionEvent event) {
-        File file = fileChooser.showOpenDialog(getWindow());
-        if (file != null) {
-            writeToFile(openText.getText(), file);
-        }
-    }
+    private TextField tpm33;
+
+    @FXML
+    private TextField vis1;
+
+    @FXML
+    private TextField vis2;
+
+    @FXML
+    private TextField vis3;
+
+    @FXML
+    private TextField cycleCount;
+
+    @FXML
+    private Label soughtProbability1;
+
+    @FXML
+    private Label soughtProbability2;
+
+    @FXML
+    private Label soughtProbability3;
 
     @FXML
     void initialize() {
-        loadSampleData();
+
     }
 
-    private void loadSampleData() {
-        keyField.setText(DEFAULT_KEY);
-        openText.setText(DEFAULT_OPEN_TEXT);
+    @FXML
+    void compute(ActionEvent event) {
+        try {
+            Model model = getModel();
+            Validator.validate(model);
+            ComputedModel computedModel = Computer.compute(model);
+            showComputedModel(computedModel);
+        } catch (ModelException e) {
+            showError(e);
+        }
     }
 
-    private String encode(String text, String key) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        KeyIterator keyIterator = new KeyIterator(key);
-
-        for (Character character : Lists.charactersOf(text)) {
-            int characterDictionaryIndex = DICTIONARY.indexOf(character);
-            int keyCharacterDictionaryIndex = DICTIONARY.indexOf(keyIterator.getCharacter());
-
-            int newEncodedCharacterIndex = (characterDictionaryIndex + keyCharacterDictionaryIndex + 1) % DICTIONARY.size();
-
-            char encodedCharacter = DICTIONARY.get(newEncodedCharacterIndex);
-            stringBuilder.append(encodedCharacter);
+    private Model getModel() throws ModelException {
+        Model model = new Model();
+        try {
+            model.setTransitionProbabilityMatrix(getTransitionProbabilityMatrix());
+        } catch (NullPointerException | NumberFormatException e) {
+            throw new ModelException("Неправильные входные данные для матрицы вероятностей перехода за один шаг");
+        }
+        try {
+            model.setInitialStatesVector(getInitialStatesVector());
+        } catch (NullPointerException | NumberFormatException e) {
+            throw new ModelException("Неправильные входные данные для вектора начальных состояний");
         }
 
-        return stringBuilder.toString();
-    }
-
-    private String decode(String text, String key) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        KeyIterator keyIterator = new KeyIterator(key);
-
-        for (Character character : Lists.charactersOf(text)) {
-            int characterDictionaryIndex = DICTIONARY.indexOf(character);
-            int keyCharacterDictionaryIndex = DICTIONARY.indexOf(keyIterator.getCharacter());
-
-            int newDecodedCharacterIndex = characterDictionaryIndex - keyCharacterDictionaryIndex - 1;
-            newDecodedCharacterIndex = newDecodedCharacterIndex < 0 ?
-                    newDecodedCharacterIndex + DICTIONARY.size() :
-                    newDecodedCharacterIndex;
-
-            stringBuilder.append(DICTIONARY.get(newDecodedCharacterIndex));
+        try {
+            model.setIterationsCount(getInteger(cycleCount));
+        } catch (NullPointerException | NumberFormatException e) {
+            throw new ModelException("Неправильные входные данные для количества циклов");
         }
-
-        return stringBuilder.toString();
+        return model;
     }
 
-    @SneakyThrows
-    private String readFromFile(File file) {
-        return Files.readString(Paths.get(file.toURI()));
+    private FieldMatrix<BigReal> getTransitionProbabilityMatrix() {
+        return MatrixUtils.createFieldMatrix(new BigReal[][]{
+                new BigReal[]{getBigReal(tpm11), getBigReal(tpm12), getBigReal(tpm13)},
+                new BigReal[]{getBigReal(tpm21), getBigReal(tpm22), getBigReal(tpm23)},
+                new BigReal[]{getBigReal(tpm31), getBigReal(tpm32), getBigReal(tpm33)}
+        });
     }
 
-    @SneakyThrows
-    private void writeToFile(String text, File file) {
-        Files.writeString(Paths.get(file.toURI()), text);
+    private FieldVector<BigReal> getInitialStatesVector() {
+        return MatrixUtils.createFieldVector(new BigReal[]{getBigReal(vis1), getBigReal(vis2), getBigReal(vis3)});
     }
 
-    private Window getWindow() {
-        return keyField.getScene().getWindow();
+    private void showComputedModel(ComputedModel computedModel) {
+        List<BigReal> probability = Arrays.asList(computedModel.getProbability().toArray());
+        soughtProbability1.setText(getAsString(probability.get(0)));
+        soughtProbability2.setText(getAsString(probability.get(1)));
+        soughtProbability3.setText(getAsString(probability.get(2)));
+    }
+
+    private BigReal getBigReal(TextField textField) {
+        return new BigReal(textField.getText());
+    }
+
+    private Integer getInteger(TextField textField) {
+        return Integer.parseInt(textField.getText());
+    }
+
+    private String getAsString(BigReal bigReal) {
+        return bigReal.bigDecimalValue().round(new MathContext(3,  RoundingMode.DOWN)).toString();
+    }
+
+    private void showError(@Nonnull Throwable error) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Ошибка");
+        alert.setHeaderText(null);
+        alert.setContentText(error.getMessage());
+        alert.show();
     }
 
 }
