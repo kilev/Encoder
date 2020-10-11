@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: com.kil.BuildMain
-Class-Path: javafx-controls-14.jar javafx-controls-14-win.jar javafx-gra
- phics-14-win.jar javafx-graphics-14.jar javafx-fxml-14-win.jar javafx-b
- ase-14.jar javafx-base-14-win.jar
-
