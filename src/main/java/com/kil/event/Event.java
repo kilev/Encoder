@@ -2,16 +2,16 @@ package com.kil.event;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
 
 @Data
 public abstract class Event implements Comparable<Event> {
-    private LocalDateTime dateTime;
+    private final Duration time;
 
     public abstract void handleEvent(EventHandler eventHandler);
 
     @Override
     public int compareTo(Event o) {
-        return dateTime.compareTo(o.getDateTime());
+        return time.compareTo(o.getTime());
     }
 }

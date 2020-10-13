@@ -1,6 +1,6 @@
 package com.kil.event;
 
-import com.kil.part.Part;
+import com.kil.factory.processor.Processor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -10,12 +10,12 @@ import java.time.Duration;
 @Getter
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class NewPartEvent extends Event {
-    private final Part part;
+public class StepCompletedEvent extends Event {
+    private final Processor processor;
 
-    public NewPartEvent(Duration time, Part part) {
+    public StepCompletedEvent(Duration time, Processor processor){
         super(time);
-        this.part = part;
+        this.processor = processor;
     }
 
     @Override

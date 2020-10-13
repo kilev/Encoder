@@ -1,4 +1,4 @@
-package com.kil.client;
+package com.kil.factory.processor;
 
 import lombok.Data;
 

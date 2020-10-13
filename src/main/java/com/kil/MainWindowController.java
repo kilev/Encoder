@@ -1,14 +1,21 @@
 package com.kil;
 
+import com.kil.factory.FactoryModel;
+import com.kil.factory.processor.Processor;
+import com.kil.factory.processor.ProcessorSlot;
+import com.kil.stream.GaussianRandomDurationStream;
+import com.kil.stream.RandomTimeStream;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+
+import java.time.Duration;
+import java.util.Arrays;
 
 public class MainWindowController {
 
@@ -97,7 +104,32 @@ public class MainWindowController {
     private Label tool3AveragePartCountInQueue;
 
     @FXML
+    private TextField modelingTime;
+
+    @FXML
     void compute(ActionEvent event) {
+        showModelStatistic(new Computer(getModel()).compute());
+    }
+
+    private FactoryModel getModel() {
+        return new FactoryModel(getDuration(modelingTime),
+                new RandomTimeStream(new GaussianRandomDurationStream(getDuration(inputM), getDuration(inputS))),
+                Arrays.asList(
+                        new Processor(new ProcessorSlot(new GaussianRandomDurationStream(getDuration(tool1M), getDuration(tool1S)))),
+                        new Processor(new ProcessorSlot(new GaussianRandomDurationStream(getDuration(tool2M), getDuration(tool2S)))),
+                        new Processor(new ProcessorSlot(new GaussianRandomDurationStream(getDuration(tool3M), getDuration(tool3S)))))
+                );
+    }
+
+    private Duration getDuration(TextField field) {
+        return Duration.parse(field.getText());
+    }
+
+    private void showModelStatistic(FactoryModel factoryModel) {
+
+    }
+
+    private void collectStatistic(FactoryModel factoryModel) {
 
     }
 

@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -240,6 +241,9 @@
                   </GridPane>
                   <HBox alignment="CENTER">
                      <children>
+                        <Label text="Продолжительность моделирования: " />
+                        <TextField fx:id="modelingTime" />
+                        <Separator opacity="0.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                         <Button mnemonicParsing="false" onAction="#compute" text="Рассчитать">
                            <HBox.margin>
                               <Insets top="5.0" />

@@ -3,15 +3,14 @@ package com.kil.part;
 import lombok.Data;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 
 @Data
 public class WaitInfo {
-    private LocalDateTime startWaitTime;
-    private LocalDateTime finishWaitTime;
+    private Duration startDuration;
+    private Duration finishDuration;
 
-    void startStayInQueue() {
-        startWaitTime = LocalDateTime.now();
+    void startStayInQueue(Duration currentDuration) {
+        startDuration = Duration.from(currentDuration);
     }
 
     /**
