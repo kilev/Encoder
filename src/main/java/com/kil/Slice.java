@@ -5,8 +5,12 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class TableRow {
-    private Double aLvl;
+public class Slice {
+    private Double alphaLevel;
     private Double low;
     private Double high;
+
+    public Slice(Double alphaLevel){
+        this.alphaLevel = alphaLevel;
+    }
 }
