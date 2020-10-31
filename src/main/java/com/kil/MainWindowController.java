@@ -1,9 +1,7 @@
 package com.kil;
 
-import com.google.common.collect.Sets;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.AreaChart;
@@ -136,9 +134,14 @@ public class MainWindowController {
     @FXML
     void divideMultiplicity(ActionEvent event) {
         clearCharts();
-        Multiplicity multiplicityC = multiplicityService.divide(
-                getMultiplicity(MultiplicityName.A),
-                getMultiplicity(MultiplicityName.B));
+        Multiplicity multiplicityC = null;
+        try {
+            multiplicityC = multiplicityService.divide(
+                    getMultiplicity(MultiplicityName.A),
+                    getMultiplicity(MultiplicityName.B));
+        } catch (MultiplicityValidationException e) {
+            showDialog(VALIDATION_ERROR_PREFIX + e.getMessage());
+        }
         this.multiplicityC.setItems(FXCollections.observableArrayList(multiplicityC.getSlices()));
         clearCharts();
         drawCharts();

@@ -31,27 +31,27 @@ public class MultiplicityService {
         List<Slice> slices = multiplicity.getSlices();
 
         if (Utils.hasDuplicates(slices, Slice::getAlphaLevel)) {
-            throw new MultiplicityValidationException("Multiplicity " + multiplicity.getName()
-                    + ": contains duplicates by Alpha level");
+            throw new MultiplicityValidationException("Множество " + multiplicity.getName()
+                    + ": содержит повторяющиеся альфа срезы");
         }
 
         if (!Ordering.natural().isOrdered(Collections2.transform(slices, Slice::getLow))) {
-            throw new MultiplicityValidationException("Multiplicity " + multiplicity.getName()
-                    + ": function specified by slices is not convex");
+            throw new MultiplicityValidationException("Множество " + multiplicity.getName()
+                    + ": Функция принадлежности не является выпуклой");
         }
 
         if (!Ordering.natural().reverse().isOrdered(Collections2.transform(slices, Slice::getHigh))) {
-            throw new MultiplicityValidationException("Multiplicity " + multiplicity.getName()
-                    + ": function specified by slices is not convex");
+            throw new MultiplicityValidationException("Множество " + multiplicity.getName()
+                    + ": Функция принадлежности не является выпуклой");
         }
 
         if (Utils.notContains(slices, Slice::getAlphaLevel, ALPHA_MIN_VALUE)) {
-            throw new MultiplicityValidationException("Multiplicity " + multiplicity.getName()
-                    + ": not contain mandatory alpha level: " + ALPHA_MIN_VALUE);
+            throw new MultiplicityValidationException("Множество " + multiplicity.getName()
+                    + ": не содержит среза с обязательным альфа уровнем: " + ALPHA_MIN_VALUE);
         }
         if (Utils.notContains(slices, Slice::getAlphaLevel, ALPHA_MAX_VALUE)) {
-            throw new MultiplicityValidationException("Multiplicity " + multiplicity.getName()
-                    + ": not contain mandatory alpha level: " + ALPHA_MAX_VALUE);
+            throw new MultiplicityValidationException("Множество " + multiplicity.getName()
+                    + ": не содержит среза с обязательным альфа уровнем: " + ALPHA_MAX_VALUE);
         }
     }
 
@@ -125,6 +125,10 @@ public class MultiplicityService {
                 .map(slice -> {
                     Double alphaLevel = slice.getAlphaLevel();
                     Slice mul2Slice = getByAlphaLevel(mul2.getSlices(), alphaLevel);
+
+                    if (mul2Slice.getHigh() == 0.0 || mul2Slice.getLow() == 0.0) {
+                        throw new MultiplicityValidationException("Невозможно выполнить операцию. Границы множества B не могут быть равны 0.");
+                    }
                     return new Slice(alphaLevel,
                             slice.getLow() / mul2Slice.getHigh(),
                             slice.getHigh() / mul2Slice.getLow());
