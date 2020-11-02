@@ -2,9 +2,11 @@ package com.kil;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MultiplicityService {
@@ -175,10 +177,25 @@ public class MultiplicityService {
 
         int missedSliceIndex = slices.indexOf(missedSlice);
         Slice previousSlice = slices.get(missedSliceIndex - 1);
-        Slice nextSlice = slices.get(missedSliceIndex + 1);
+        Point previousSliceLowPoint = new Point(previousSlice.getLow(), previousSlice.getAlphaLevel());
+        Point previousSliceHighPoint = new Point(previousSlice.getHigh(), previousSlice.getAlphaLevel());
 
-        missedSlice.setHigh((previousSlice.getHigh() + nextSlice.getHigh()) / 2);
-        missedSlice.setLow((previousSlice.getLow() + nextSlice.getLow()) / 2);
+        Slice nextSlice = slices.get(missedSliceIndex + 1);
+        Point nextSliceLowPoint = new Point(nextSlice.getLow(), nextSlice.getAlphaLevel());
+        Point nextSliceHighPoint = new Point(nextSlice.getHigh(), nextSlice.getAlphaLevel());
+
+//        missedSlice.setHigh((previousSlice.getHigh() + nextSlice.getHigh()) / 2);
+//        missedSlice.setLow((previousSlice.getLow() + nextSlice.getLow()) / 2);
+        missedSlice.setLow(calculateXValueByStraightLineEquation(previousSliceLowPoint, nextSliceLowPoint, missedSlice.getAlphaLevel()));
+        missedSlice.setHigh(calculateXValueByStraightLineEquation(previousSliceHighPoint, nextSliceHighPoint, missedSlice.getAlphaLevel()));
+    }
+
+    private double calculateXValueByStraightLineEquation(Point firstPoint, Point secondPoint, double yValue) {
+//        double a = secondPoint.getY() - firstPoint.getY();
+//        double b = firstPoint.getX() - secondPoint.getX();
+//        double c = a * firstPoint.getX() + b * firstPoint.getY();
+
+        return (((yValue - firstPoint.getY()) * (secondPoint.getX() - firstPoint.getX())) / (secondPoint.getY() - firstPoint.getY())) + firstPoint.getX();
     }
 
     private void sortByAlphaLevel(List<Slice> slices) {

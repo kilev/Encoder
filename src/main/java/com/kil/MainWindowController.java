@@ -133,7 +133,7 @@ public class MainWindowController {
 
     @FXML
     void divideMultiplicity(ActionEvent event) {
-        clearCharts();
+        onSliceChanged(null);
         Multiplicity multiplicityC = null;
         try {
             multiplicityC = multiplicityService.divide(
@@ -143,40 +143,36 @@ public class MainWindowController {
             showDialog(VALIDATION_ERROR_PREFIX + e.getMessage());
         }
         this.multiplicityC.setItems(FXCollections.observableArrayList(multiplicityC.getSlices()));
-        clearCharts();
         drawCharts();
     }
 
     @FXML
     void minusMultiplicity(ActionEvent event) {
-        clearCharts();
+        onSliceChanged(null);
         Multiplicity multiplicityC = multiplicityService.minus(
                 getMultiplicity(MultiplicityName.A),
                 getMultiplicity(MultiplicityName.B));
         this.multiplicityC.setItems(FXCollections.observableArrayList(multiplicityC.getSlices()));
-        clearCharts();
         drawCharts();
     }
 
     @FXML
     void multiMultiplicity(ActionEvent event) {
-        clearCharts();
+        onSliceChanged(null);
         Multiplicity multiplicityC = multiplicityService.multi(
                 getMultiplicity(MultiplicityName.A),
                 getMultiplicity(MultiplicityName.B));
         this.multiplicityC.setItems(FXCollections.observableArrayList(multiplicityC.getSlices()));
-        clearCharts();
         drawCharts();
     }
 
     @FXML
     void plusMultiplicity(ActionEvent event) {
-        clearCharts();
+        onSliceChanged(null);
         Multiplicity multiplicityC = multiplicityService.plus(
                 getMultiplicity(MultiplicityName.A),
                 getMultiplicity(MultiplicityName.B));
         this.multiplicityC.setItems(FXCollections.observableArrayList(multiplicityC.getSlices()));
-        clearCharts();
         drawCharts();
     }
 
