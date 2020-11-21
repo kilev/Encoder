@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MultiplicityService {
+    public static final String MULTIPLICITY_PREFIX = "Множество ";
+
     public static final double ALPHA_MIN_VALUE = 0.0;
     public static final double ALPHA_MAX_VALUE = 1.0;
 
@@ -32,29 +34,55 @@ public class MultiplicityService {
     public void validate(Multiplicity multiplicity) {
         List<Slice> slices = multiplicity.getSlices();
 
+        slices.forEach(slice -> {
+            if(slice.getAlphaLevel() < 0d){
+                throw new MultiplicityValidationException(MULTIPLICITY_PREFIX + multiplicity.getName()
+                + ": недопустимое отрицательное значение для альфа-уровня");
+            }
+
+//            if(slice.getLow() < 0d){
+//                throw new MultiplicityValidationException(MULTIPLICITY_PREFIX + multiplicity.getName()
+//                        + ": недопустимое отрицательное значение для нижний границы");
+//            }
+//
+//            if(slice.getHigh() < 0d){
+//                throw new MultiplicityValidationException(MULTIPLICITY_PREFIX + multiplicity.getName()
+//                        + ": недопустимое отрицательное значение для верхней границы");
+//            }
+        });
+
         if (Utils.hasDuplicates(slices, Slice::getAlphaLevel)) {
-            throw new MultiplicityValidationException("Множество " + multiplicity.getName()
+            throw new MultiplicityValidationException(MULTIPLICITY_PREFIX + multiplicity.getName()
                     + ": содержит повторяющиеся альфа срезы");
         }
 
         if (!Ordering.natural().isOrdered(Collections2.transform(slices, Slice::getLow))) {
-            throw new MultiplicityValidationException("Множество " + multiplicity.getName()
+            throw new MultiplicityValidationException(MULTIPLICITY_PREFIX + multiplicity.getName()
                     + ": Функция принадлежности не является выпуклой");
         }
 
         if (!Ordering.natural().reverse().isOrdered(Collections2.transform(slices, Slice::getHigh))) {
-            throw new MultiplicityValidationException("Множество " + multiplicity.getName()
+            throw new MultiplicityValidationException(MULTIPLICITY_PREFIX + multiplicity.getName()
                     + ": Функция принадлежности не является выпуклой");
         }
 
         if (Utils.notContains(slices, Slice::getAlphaLevel, ALPHA_MIN_VALUE)) {
-            throw new MultiplicityValidationException("Множество " + multiplicity.getName()
+            throw new MultiplicityValidationException(MULTIPLICITY_PREFIX + multiplicity.getName()
                     + ": не содержит среза с обязательным альфа уровнем: " + ALPHA_MIN_VALUE);
         }
+
         if (Utils.notContains(slices, Slice::getAlphaLevel, ALPHA_MAX_VALUE)) {
-            throw new MultiplicityValidationException("Множество " + multiplicity.getName()
+            throw new MultiplicityValidationException(MULTIPLICITY_PREFIX + multiplicity.getName()
                     + ": не содержит среза с обязательным альфа уровнем: " + ALPHA_MAX_VALUE);
         }
+
+        slices.stream()
+                .filter(slice -> slice.getAlphaLevel() == ALPHA_MAX_VALUE)
+                .filter(slice -> slice.getLow() > slice.getHigh())
+                .forEach(slice -> {
+                    throw new MultiplicityValidationException(MULTIPLICITY_PREFIX + multiplicity.getName()
+                    + ": Функция принадлежности не является выпуклой");
+                });
     }
 
     public Comparator<Multiplicity> getComparator() {

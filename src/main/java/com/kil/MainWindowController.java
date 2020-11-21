@@ -134,6 +134,7 @@ public class MainWindowController {
     @FXML
     void divideMultiplicity(ActionEvent event) {
         onSliceChanged(null);
+        clearCharts();
         Multiplicity multiplicityC = null;
         try {
             multiplicityC = multiplicityService.divide(
@@ -149,6 +150,7 @@ public class MainWindowController {
     @FXML
     void minusMultiplicity(ActionEvent event) {
         onSliceChanged(null);
+        clearCharts();
         Multiplicity multiplicityC = multiplicityService.minus(
                 getMultiplicity(MultiplicityName.A),
                 getMultiplicity(MultiplicityName.B));
@@ -159,6 +161,7 @@ public class MainWindowController {
     @FXML
     void multiMultiplicity(ActionEvent event) {
         onSliceChanged(null);
+        clearCharts();
         Multiplicity multiplicityC = multiplicityService.multi(
                 getMultiplicity(MultiplicityName.A),
                 getMultiplicity(MultiplicityName.B));
@@ -169,6 +172,7 @@ public class MainWindowController {
     @FXML
     void plusMultiplicity(ActionEvent event) {
         onSliceChanged(null);
+        clearCharts();
         Multiplicity multiplicityC = multiplicityService.plus(
                 getMultiplicity(MultiplicityName.A),
                 getMultiplicity(MultiplicityName.B));
