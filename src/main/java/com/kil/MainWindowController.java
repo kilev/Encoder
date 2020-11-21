@@ -1,151 +1,87 @@
 package com.kil;
 
-import com.google.common.collect.Lists;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextArea;
+import javafx.scene.Node;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import lombok.SneakyThrows;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
 
 public class MainWindowController {
-    private static final Character LINE_SEPARATOR = '\n';
+    private static final FileChooser FILE_CHOOSER = new FileChooser();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final String LINE_SEPARATOR = System.lineSeparator();
 
-    private static final String DEFAULT_KEY = "ВАЗА";
-    private static final String DEFAULT_OPEN_TEXT = "КРИПТОГРАФИЯ";
-
-    private static final List<Character> DICTIONARY = List.of(
-            'А', 'а', 'Б', 'б', 'В', 'в', 'Г', 'г',
-            'Д', 'д', 'Е', 'е', 'Ё', 'ё', 'Ж', 'ж',
-            'З', 'з', 'И', 'и', 'Й', 'й', 'К', 'к',
-            'Л', 'л', 'М', 'м', 'Н', 'н', 'О', 'о',
-            'П', 'п', 'Р', 'р', 'С', 'с', 'Т', 'т',
-            'У', 'у', 'Ф', 'ф', 'Х', 'х', 'Ц', 'ц',
-            'Ч', 'ч', 'Ш', 'ш', 'Щ', 'щ', 'Ъ', 'ъ',
-            'Ы', 'ы', 'Ь', 'ь', 'Э', 'э', 'Ю', 'ю',
-            'Я', 'я', '?', '#', '@', '$', '%', '^',
-            '&', '*', LINE_SEPARATOR);
-
-    private static final FileChooser fileChooser = new FileChooser();
+    //    Checksum checksum = new CRC32();
 
     @FXML
-    private TextField keyField;
+    private ChoiceBox<EncodingType> encodingTypeChoiceBox;
 
     @FXML
-    private TextArea openText;
+    private ChoiceBox<EncodingMethod> encodingMethodChoiceBox;
 
     @FXML
-    private TextArea closeText;
+    private TextField polynomial;
 
     @FXML
-    void decodeCloseText(ActionEvent event) {
-        openText.setText(decode(closeText.getText(), keyField.getText()));
-    }
-
-    @FXML
-    void encodeOpenText(ActionEvent event) {
-        closeText.setText(encode(openText.getText(), keyField.getText()));
-    }
-
-    @FXML
-    void loadCloseDataFromFile(ActionEvent event) {
-        File file = fileChooser.showOpenDialog(getWindow());
-        if (file != null) {
-            closeText.setText(readFromFile(file));
-        }
-    }
-
-    @FXML
-    void loadOpenDataFromFile(ActionEvent event) {
-        File file = fileChooser.showOpenDialog(getWindow());
-        if (file != null) {
-            openText.setText(readFromFile(file));
-        }
-    }
-
-
-    @FXML
-    void saveCloseDataToFile(ActionEvent event) {
-        File file = fileChooser.showOpenDialog(getWindow());
-        if (file != null) {
-            writeToFile(closeText.getText(), file);
-        }
-    }
-
-    @FXML
-    void saveOpenDataToFile(ActionEvent event) {
-        File file = fileChooser.showOpenDialog(getWindow());
-        if (file != null) {
-            writeToFile(openText.getText(), file);
-        }
-    }
+    private TextField data;
 
     @FXML
     void initialize() {
-        loadSampleData();
+        encodingTypeChoiceBox.getItems().addAll(EncodingType.values());
+        encodingMethodChoiceBox.getItems().addAll(EncodingMethod.values());
+
+        encodingTypeChoiceBox.getSelectionModel().select(0);
+        encodingMethodChoiceBox.getSelectionModel().select(0);
     }
 
-    private void loadSampleData() {
-        keyField.setText(DEFAULT_KEY);
-        openText.setText(DEFAULT_OPEN_TEXT);
-    }
+    @FXML
+    void checkFile(ActionEvent event) {
 
-    private String encode(String text, String key) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        KeyIterator keyIterator = new KeyIterator(key);
-
-        for (Character character : Lists.charactersOf(text)) {
-            int characterDictionaryIndex = DICTIONARY.indexOf(character);
-            int keyCharacterDictionaryIndex = DICTIONARY.indexOf(keyIterator.getCharacter());
-
-            int newEncodedCharacterIndex = (characterDictionaryIndex + keyCharacterDictionaryIndex + 1) % DICTIONARY.size();
-
-            char encodedCharacter = DICTIONARY.get(newEncodedCharacterIndex);
-            stringBuilder.append(encodedCharacter);
-        }
-
-        return stringBuilder.toString();
-    }
-
-    private String decode(String text, String key) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        KeyIterator keyIterator = new KeyIterator(key);
-
-        for (Character character : Lists.charactersOf(text)) {
-            int characterDictionaryIndex = DICTIONARY.indexOf(character);
-            int keyCharacterDictionaryIndex = DICTIONARY.indexOf(keyIterator.getCharacter());
-
-            int newDecodedCharacterIndex = characterDictionaryIndex - keyCharacterDictionaryIndex - 1;
-            newDecodedCharacterIndex = newDecodedCharacterIndex < 0 ?
-                    newDecodedCharacterIndex + DICTIONARY.size() :
-                    newDecodedCharacterIndex;
-
-            stringBuilder.append(DICTIONARY.get(newDecodedCharacterIndex));
-        }
-
-        return stringBuilder.toString();
     }
 
     @SneakyThrows
-    private String readFromFile(File file) {
-        return Files.readString(Paths.get(file.toURI()));
+    @FXML
+    void loadFile(ActionEvent event) {
+        File file = FILE_CHOOSER.showOpenDialog(getWindow(event));
+        if (file == null) {
+            return;
+        }
+        CrcFile crcFile = MAPPER.readValue(file, CrcFile.class);
+        initFile(crcFile);
     }
 
     @SneakyThrows
-    private void writeToFile(String text, File file) {
-        Files.writeString(Paths.get(file.toURI()), text);
+    @FXML
+    void saveFile(ActionEvent event) {
+        File file = FILE_CHOOSER.showSaveDialog(getWindow(event));
+        if (file == null) {
+            return;
+        }
+        MAPPER.writeValue(file, getCrcFile());
     }
 
-    private Window getWindow() {
-        return keyField.getScene().getWindow();
+    private void initFile(CrcFile crcFile) {
+        data.setText(crcFile.getData());
+        encodingTypeChoiceBox.getSelectionModel().select(crcFile.getEncodingType());
+        encodingMethodChoiceBox.getSelectionModel().select(crcFile.getEncodingMethod());
+    }
+
+    private CrcFile getCrcFile() {
+        CrcFile crcFile = new CrcFile();
+        crcFile.setData(data.getText());
+        crcFile.setEncodingType(encodingTypeChoiceBox.getValue());
+        crcFile.setEncodingMethod(encodingMethodChoiceBox.getValue());
+        return crcFile;
+    }
+
+    private Window getWindow(ActionEvent event) {
+        return ((Node) event.getTarget()).getScene().getWindow();
     }
 
 }

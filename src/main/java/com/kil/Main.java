@@ -15,7 +15,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/mainWindow.fxml"));
         Parent mainWindow = loader.load();
         stage.setScene(new Scene(mainWindow));
-        stage.setTitle("TextEncoder");
+        stage.setTitle("Jave applicataion");
         stage.show();
     }
 
