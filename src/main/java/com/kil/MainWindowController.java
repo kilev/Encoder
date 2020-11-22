@@ -4,22 +4,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import lombok.SneakyThrows;
 
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.util.Optional;
 
 public class MainWindowController {
     private static final FileChooser FILE_CHOOSER = new FileChooser();
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final CrcService crcService = new CrcService();
+    private final LicenseService licenseService = new LicenseService();
 
     @FXML
     private ChoiceBox<EncodingType> encodingTypeChoiceBox;
@@ -37,6 +36,27 @@ public class MainWindowController {
     void initialize() {
         encodingTypeChoiceBox.getItems().addAll(EncodingType.values());
         encodingTypeChoiceBox.getSelectionModel().select(0);
+
+        if (!licenseService.isValidHardWare()) {
+            showHardwareLicenseDialog();
+        }
+    }
+
+    private void showHardwareLicenseDialog() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Ошибка лицензии");
+        alert.setHeaderText("Похоже у вас нет прав на использование программы на этом устройстве");
+        alert.setContentText("Что будем делать?");
+
+        ButtonType buttonTypeOk = new ButtonType("Мне только посмотреть");
+        ButtonType buttonTypeNotOk = new ButtonType("Ладно, выхожу");
+
+        alert.getButtonTypes().setAll(buttonTypeOk, buttonTypeNotOk);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == buttonTypeNotOk) {
+            System.exit(0);
+        }
     }
 
     @FXML
@@ -59,7 +79,7 @@ public class MainWindowController {
                 Integer.parseInt(crcFile.getPolynomial(), 2));
 
         String savedCrc = crcFile.getCrc();
-        showDialog(savedCrc.equals(calculatedCrc) ?
+        showInfoDialog(savedCrc.equals(calculatedCrc) ?
                 "Файл не поврежден" :
                 "Файл поврежден");
     }
@@ -78,11 +98,28 @@ public class MainWindowController {
     @SneakyThrows
     @FXML
     void saveFile(ActionEvent event) {
+        if (!licenseService.isLicenseActivated()) {
+            showLicenseActivateDialog();
+            return;
+        }
+
         File file = FILE_CHOOSER.showSaveDialog(getWindow(event));
         if (file == null) {
             return;
         }
         MAPPER.writeValue(file, getCrcFile());
+    }
+
+    private void showLicenseActivateDialog() {
+        TextInputDialog dialog = new TextInputDialog("4f4949a7-fcc0-4a92-bf9f-df30a6e2252a");
+        dialog.setTitle("Ошибка лицензии");
+        dialog.setHeaderText("CRC посчитать таки бесплатно, в файл сохранить таки лицензию покупай");
+        dialog.setContentText("Введите лицензионный ключ:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(key -> showInfoDialog(licenseService.activateLicence(key) ?
+                "Лицензия активирована" :
+                "Ошибка лицензии"));
     }
 
     private void initFile(CrcFile crcFile) {
@@ -101,7 +138,7 @@ public class MainWindowController {
         return crcFile;
     }
 
-    private void showDialog(@Nonnull String message) {
+    private void showInfoDialog(@Nonnull String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Уведомление:");
         alert.setHeaderText(null);
