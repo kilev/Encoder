@@ -6,5 +6,6 @@ import lombok.Data;
 public class CrcFile {
     private String data;
     private EncodingType encodingType;
-    private EncodingMethod encodingMethod;
+    private String polynomial;
+    private String crc;
 }

@@ -1,39 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <Pane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kil.MainWindowController">
    <children>
       <VBox alignment="CENTER">
          <children>
-            <GridPane>
-              <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-              </columnConstraints>
-              <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-              </rowConstraints>
-               <children>
-                  <HBox alignment="CENTER_RIGHT">
-                     <children>
-                        <Label text="Тип кодирования: " />
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="1">
-                     <children>
-                        <Label text="Тип полинома: " />
-                     </children>
-                  </HBox>
-                  <ChoiceBox fx:id="encodingTypeChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" />
-                  <ChoiceBox fx:id="encodingMethodChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <TextField fx:id="polynomial" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-               </children>
-            </GridPane>
-            <Separator opacity="0.0" orientation="VERTICAL" />
             <VBox>
                <children>
                   <HBox alignment="CENTER">
@@ -41,38 +14,47 @@
                         <Label text="Файл" />
                      </children>
                   </HBox>
-                  <HBox>
+                  <HBox alignment="CENTER">
                      <children>
                         <GridPane gridLinesVisible="true">
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                           </columnConstraints>
                           <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                           </rowConstraints>
                            <children>
-                              <HBox alignment="CENTER">
+                              <HBox alignment="CENTER_RIGHT">
                                  <children>
-                                    <Label text="Текст" />
+                                    <Label text="Текст:" />
                                  </children>
+                                 <padding>
+                                    <Insets right="5.0" />
+                                 </padding>
                               </HBox>
-                              <HBox alignment="CENTER" GridPane.rowIndex="2">
+                              <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="3">
                                  <children>
-                                    <Label text="CRC" />
+                                    <Label text="CRC:" />
                                  </children>
+                                 <padding>
+                                    <Insets right="5.0" />
+                                 </padding>
                               </HBox>
-                              <HBox alignment="CENTER" GridPane.rowIndex="1">
+                              <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="1">
                                  <children>
-                                    <Label text="Метод" />
+                                    <Label text="Метод:" />
                                  </children>
+                                 <padding>
+                                    <Insets right="5.0" />
+                                 </padding>
                               </HBox>
-                              <Label GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <HBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                              <HBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="3">
                                  <children>
-                                    <Label text="ЦРЦ" />
+                                    <Label fx:id="crcValue" text="CRC" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER" GridPane.columnIndex="1">
@@ -82,13 +64,24 @@
                               </HBox>
                               <HBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                  <children>
-                                    <Label text="Метод" />
+                                    <ChoiceBox fx:id="encodingTypeChoiceBox" />
                                  </children>
                               </HBox>
+                              <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="2">
+                                 <children>
+                                    <Label text="Полином:" />
+                                 </children>
+                                 <padding>
+                                    <Insets right="5.0" />
+                                 </padding>
+                              </HBox>
+                              <TextField fx:id="polynomial" alignment="CENTER" prefWidth="120.0" text="1101" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                            </children>
                         </GridPane>
                         <VBox alignment="CENTER">
                            <children>
+                              <Button mnemonicParsing="false" onAction="#updateCrc" text="Обновить CRC" />
+                              <Separator opacity="0.0" orientation="VERTICAL" />
                               <Button mnemonicParsing="false" onAction="#checkFile" text="Проверить" />
                               <Separator opacity="0.0" orientation="VERTICAL" />
                               <Button mnemonicParsing="false" onAction="#loadFile" text="Загрузить" />

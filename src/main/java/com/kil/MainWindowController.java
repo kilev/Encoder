@@ -4,26 +4,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import lombok.SneakyThrows;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 
 public class MainWindowController {
     private static final FileChooser FILE_CHOOSER = new FileChooser();
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String LINE_SEPARATOR = System.lineSeparator();
 
-    //    Checksum checksum = new CRC32();
+    private final CrcService crcService = new CrcService();
 
     @FXML
     private ChoiceBox<EncodingType> encodingTypeChoiceBox;
-
-    @FXML
-    private ChoiceBox<EncodingMethod> encodingMethodChoiceBox;
 
     @FXML
     private TextField polynomial;
@@ -32,17 +31,37 @@ public class MainWindowController {
     private TextField data;
 
     @FXML
+    private Label crcValue;
+
+    @FXML
     void initialize() {
         encodingTypeChoiceBox.getItems().addAll(EncodingType.values());
-        encodingMethodChoiceBox.getItems().addAll(EncodingMethod.values());
-
         encodingTypeChoiceBox.getSelectionModel().select(0);
-        encodingMethodChoiceBox.getSelectionModel().select(0);
+    }
+
+    @FXML
+    void updateCrc(ActionEvent event) {
+        CrcFile crcFile = getCrcFile();
+        String crc = crcService.calculateCrc(
+                crcFile.getData(),
+                crcFile.getEncodingType(),
+                Integer.parseInt(crcFile.getPolynomial(), 2));
+        crcFile.setCrc(crc);
+        initFile(crcFile);
     }
 
     @FXML
     void checkFile(ActionEvent event) {
+        CrcFile crcFile = getCrcFile();
+        String calculatedCrc = crcService.calculateCrc(
+                crcFile.getData(),
+                crcFile.getEncodingType(),
+                Integer.parseInt(crcFile.getPolynomial(), 2));
 
+        String savedCrc = crcFile.getCrc();
+        showDialog(savedCrc.equals(calculatedCrc) ?
+                "Файл не поврежден" :
+                "Файл поврежден");
     }
 
     @SneakyThrows
@@ -69,15 +88,25 @@ public class MainWindowController {
     private void initFile(CrcFile crcFile) {
         data.setText(crcFile.getData());
         encodingTypeChoiceBox.getSelectionModel().select(crcFile.getEncodingType());
-        encodingMethodChoiceBox.getSelectionModel().select(crcFile.getEncodingMethod());
+        polynomial.setText(crcFile.getPolynomial());
+        crcValue.setText(crcFile.getCrc());
     }
 
     private CrcFile getCrcFile() {
         CrcFile crcFile = new CrcFile();
         crcFile.setData(data.getText());
         crcFile.setEncodingType(encodingTypeChoiceBox.getValue());
-        crcFile.setEncodingMethod(encodingMethodChoiceBox.getValue());
+        crcFile.setPolynomial(polynomial.getText());
+        crcFile.setCrc(crcValue.getText());
         return crcFile;
+    }
+
+    private void showDialog(@Nonnull String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Уведомление:");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private Window getWindow(ActionEvent event) {
